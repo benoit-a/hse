@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: get deps
+      run: sudo apt install -y gettext bison autopoint uuid-dev
+    - name: compile mpool
+      run: git clone https://github.com/benoit-a/mpool.git && cd mpool && git checkout user/benoit/actions && make && sudo make install
     - name: make
       run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
