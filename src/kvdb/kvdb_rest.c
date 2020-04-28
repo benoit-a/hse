@@ -174,7 +174,8 @@ rest_kvdb_compact_status(
     b += snprintf_append(buf, bufsz, &buf_off, "samp_curr_pct: %u\n", status.kvcs_samp_curr);
     b += snprintf_append(buf, bufsz, &buf_off, "request_active: %u\n", status.kvcs_active);
 
-    write(info->resp_fd, buf, b);
+    if (write(info->resp_fd, buf, b) < 0)
+        return merr(errno);
 
     return 0;
 }
