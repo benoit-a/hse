@@ -1,0 +1,21 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: get deps
+      run: sudo apt -y update && sudo apt -y remove openjdk\* zulu\* && sudo apt install -y gettext bison autopoint uuid-dev libmicrohttpd-dev libbsd-dev liburcu-dev openjdk-8-jdk && dpkg -l && dpkg -S jni.h
+    - name: compile mpool
+      run: git clone https://github.com/benoit-a/mpool.git && cd mpool && git checkout user/benoit/actions && make && sudo make install
+    - name: make
+      run: make

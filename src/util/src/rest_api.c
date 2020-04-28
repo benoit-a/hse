@@ -801,7 +801,10 @@ webserver_response(
                 REST_VERSION_MAJOR,
                 REST_VERSION_MINOR,
                 version);
-            write(write_fd, session->buf, bytes);
+            if (write(write_fd, session->buf, bytes) < 0) {
+                http_status = MHD_HTTP_BAD_REQUEST;
+                goto respond;
+            }
             http_status = MHD_HTTP_OK;
             shutdown(write_fd, SHUT_RDWR);
             goto respond;
@@ -811,7 +814,9 @@ webserver_response(
         if (strcmp(method, MHD_HTTP_METHOD_GET) == 0 && strcasecmp(path, "help") == 0) {
             http_status = MHD_HTTP_OK;
             gen_help_msg(&bytes, session->buf, sizeof(session->buf));
-            write(write_fd, session->buf, bytes);
+            if (write(write_fd, session->buf, bytes) < 0) {
+                goto respond; // what to do ??
+            }
             shutdown(write_fd, SHUT_RDWR);
         }
 
@@ -878,7 +883,9 @@ respond:
         size_t bytes;
 
         gen_help_msg(&bytes, session->buf, sizeof(session->buf));
-        write(write_fd, session->buf, bytes);
+        if (write(write_fd, session->buf, bytes) < 0) {
+            hse_log(HSE_ERR "rest api internal error: cannot write");
+        }
         shutdown(write_fd, SHUT_RDWR);
         if (udesc)
             atomic_dec(&udesc->refcnt);
