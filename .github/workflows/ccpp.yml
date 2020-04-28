@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: get deps
-      run: sudo apt install -y gettext bison autopoint uuid-dev libmicrohttpd-dev libbsd-dev liburcu-dev
+      run: sudo apt install -y gettext bison autopoint uuid-dev libmicrohttpd-dev libbsd-dev liburcu-dev openjdk-8-jdk-headless && dpkg -l
     - name: compile mpool
       run: git clone https://github.com/benoit-a/mpool.git && cd mpool && git checkout user/benoit/actions && make && sudo make install
     - name: make
