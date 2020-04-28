@@ -45,7 +45,8 @@ rest_dt_put(
     if (!tree) {
         const char *msg = "No data tree found\n";
 
-        write(info->resp_fd, msg, strlen(msg));
+        if (write(info->resp_fd, msg, strlen(msg)) < 0)
+            return merr(ev(errno));
         return merr(ev(ENOENT));
     }
 
@@ -61,7 +62,10 @@ rest_dt_put(
     if (!dte) {
         size_t n = snprintf(buf, sizeof(buf), "Invalid path: %s\n", dsp.path);
 
-        write(info->resp_fd, buf, n);
+        if (write(info->resp_fd, buf, n) < 0) {
+            free(dsp.path);
+            return merr(ev(errno));
+        }
         free(dsp.path);
         return merr(ev(ENXIO));
     }
@@ -85,7 +89,10 @@ rest_dt_put(
     }
     yaml_end_element_type(&yc);
 
-    write(info->resp_fd, buf, yc.yaml_offset);
+    if (write(info->resp_fd, buf, yc.yaml_offset) < 0) {
+        free(dsp.path);
+        return merr(ev(errno));
+    }
 
     free(dsp.path);
 
